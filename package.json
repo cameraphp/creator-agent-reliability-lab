@@ -1,0 +1,50 @@
+{
+  "name": "creator-agent-reliability-lab",
+  "version": "0.1.0",
+  "description": "Local, synthetic reference lab: durable creator-draft jobs on real PostgreSQL (RLS, leases, fencing, provider-call receipts) with a controlled baseline-vs-hardened reliability evaluation. No real providers, models or accounts.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -p creator-agent-reliability-lab up -d --wait lab-postgres",
+    "db:down": "docker compose -p creator-agent-reliability-lab stop lab-postgres",
+    "db:migrate": "tsx src/cli/db.ts migrate",
+    "db:reset": "tsx src/cli/db.ts reset",
+    "db:status": "tsx src/cli/db.ts status",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "api": "tsx src/cli/api.ts",
+    "worker:once": "tsx src/cli/worker.ts --once",
+    "worker": "tsx src/cli/worker.ts",
+    "client": "tsx src/cli/client.ts",
+    "ops": "tsx src/cli/ops.ts",
+    "demo": "tsx src/cli/demo.ts",
+    "evaluate:baseline": "tsx src/cli/evaluate.ts baseline",
+    "evaluate:baseline:expect": "tsx src/cli/evaluate.ts baseline --expect-defects",
+    "evaluate:hardened": "tsx src/cli/evaluate.ts hardened",
+    "compare": "tsx src/cli/compare.ts",
+    "smoke": "npm run build && node dist/cli/smoke.js"
+  },
+  "dependencies": {
+    "fastify": "5.12.7",
+    "pg": "8.23.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "eslint": "10.14.0",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5"
+  }
+}

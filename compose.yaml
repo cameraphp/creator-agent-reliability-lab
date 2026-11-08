@@ -1,0 +1,30 @@
+# Project-scoped, loopback-only, throwaway PostgreSQL for this lab.
+# Credentials below are NON-PRODUCTION local values documented in .env.example.
+name: creator-agent-reliability-lab
+
+services:
+  lab-postgres:
+    image: postgres:17.11-alpine
+    container_name: creator-agent-reliability-lab-pg
+    environment:
+      POSTGRES_USER: lab_admin
+      POSTGRES_PASSWORD: lab_admin_local_only
+      POSTGRES_DB: creator_lab
+    ports:
+      # Loopback only. Never 0.0.0.0.
+      - "127.0.0.1:55439:5432"
+    volumes:
+      - creator-agent-reliability-lab-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab_admin -d creator_lab"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    labels:
+      lab.project: creator-agent-reliability-lab
+
+volumes:
+  creator-agent-reliability-lab-pgdata:
+    name: creator-agent-reliability-lab-pgdata
+    labels:
+      lab.project: creator-agent-reliability-lab

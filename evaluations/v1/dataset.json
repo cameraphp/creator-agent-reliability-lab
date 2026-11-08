@@ -1,0 +1,1012 @@
+{
+  "dataset_version": "eval-v1",
+  "catalog_version": "v1",
+  "notice": "Synthetic, fixture-defined scenarios. Outcomes are scripted provider-double behaviours, not real model quality. Identical inputs and scripts are used for baseline and hardened runs.",
+  "defect_categories": {
+    "F01": "Wrong route and unsafe retry/fallback after provider uncertainty",
+    "F02": "Chat switch / obsolete context delivers a result to the wrong journey",
+    "F03": "Lost connection / crash / bad repair corrupt save and reopen"
+  },
+  "routing_cases": [
+    {
+      "id": "RT01",
+      "task": "classify_video",
+      "context_tokens": 300,
+      "turnaround": "standard",
+      "health": {},
+      "expected": "quick-classify"
+    },
+    {
+      "id": "RT02",
+      "task": "classify_video",
+      "context_tokens": 5000,
+      "turnaround": "standard",
+      "health": {},
+      "expected": "deep-profile"
+    },
+    {
+      "id": "RT03",
+      "task": "draft_dialogue",
+      "context_tokens": 900,
+      "turnaround": "standard",
+      "health": {},
+      "expected": "structured-dialogue"
+    },
+    {
+      "id": "RT04",
+      "task": "draft_dialogue",
+      "context_tokens": 900,
+      "turnaround": "fast",
+      "health": {},
+      "expected": "structured-dialogue"
+    },
+    {
+      "id": "RT05",
+      "task": "draft_dialogue",
+      "context_tokens": 900,
+      "turnaround": "standard",
+      "health": { "structured-dialogue": "failed_pre_acceptance" },
+      "expected": "compatible-backup"
+    },
+    {
+      "id": "RT06",
+      "task": "draft_dialogue",
+      "context_tokens": 9000,
+      "turnaround": "standard",
+      "health": {},
+      "expected": null
+    },
+    {
+      "id": "RT07",
+      "task": "analyze_profile",
+      "context_tokens": 12000,
+      "turnaround": "standard",
+      "health": {},
+      "expected": "deep-profile"
+    },
+    {
+      "id": "RT08",
+      "task": "draft_dialogue",
+      "context_tokens": 900,
+      "turnaround": "standard",
+      "health": { "structured-dialogue": "acceptance_unknown" },
+      "expected": null
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "C01-happy-desk-notes",
+      "category": "CONTROL",
+      "class": "happy",
+      "title": "Happy journey for desk-notes with close/reopen",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "c01-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "close_app" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "C02-happy-study-sparks",
+      "category": "CONTROL",
+      "class": "happy",
+      "title": "Happy journey for study-sparks with close/reopen",
+      "script": {},
+      "steps": [
+        { "op": "set_active", "conversation": "ss-conv-1" },
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-study-sparks",
+          "conversation": "ss-conv-1",
+          "video": "vid-ss-001",
+          "brief": "brief-exam-sprint",
+          "key": "c02-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "close_app" },
+        { "op": "reopen", "actor": "actor-study-sparks", "conversation": "ss-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "ss-conv-1": 1 }
+      }
+    },
+    {
+      "id": "C03-two-conversations-sequential",
+      "category": "CONTROL",
+      "class": "happy",
+      "title": "Same creator, two conversations, processed one after another",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "c03-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "set_active", "conversation": "dn-conv-2" },
+        {
+          "op": "submit",
+          "job": "second",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-2",
+          "video": "vid-dn-002",
+          "brief": "brief-desk-reset",
+          "key": "c03-second-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" }, "second": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 4,
+        "drafts": { "dn-conv-1": 1, "dn-conv-2": 1 }
+      }
+    },
+    {
+      "id": "C04-revision-published-before-submit",
+      "category": "CONTROL",
+      "class": "happy",
+      "title": "Battery brief after tc-r2 is published: current facts are used",
+      "script": {},
+      "steps": [
+        { "op": "publish_revision", "product": "tallycube", "revision": "tc-r2" },
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-battery",
+          "key": "c04-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "C05-expired-account",
+      "category": "CONTROL",
+      "class": "unrecoverable",
+      "title": "Expired synthetic account connection fails safely before any provider call",
+      "script": {},
+      "steps": [
+        { "op": "expire_account", "creator": "desk-notes" },
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "c05-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "ACCOUNT_RECONNECT_REQUIRED" } },
+        "max_billable_ops": 0,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "C06-known-transport-error",
+      "category": "CONTROL",
+      "class": "recoverable",
+      "title": "One known pre-acceptance transport failure is retried safely",
+      "script": { "structured-dialogue": ["transport_error"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "c06-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+
+    {
+      "id": "F01-01-fast-brief-incompatible-route",
+      "category": "F01",
+      "class": "happy",
+      "title": "Fast-turnaround brief must not be routed to the cheap profile whose window cannot fit the task",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-002",
+          "brief": "brief-desk-fast",
+          "key": "f0101-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-02-timeout-after-acceptance-idempotent",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Primary accepts then the caller times out; status lookup must recover without a second paid call",
+      "script": { "structured-dialogue": ["timeout_after_acceptance"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0102-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-03-late-result-after-deadline",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Result arrives after the deadline; it is discarded and reconciled, not double-billed via fallback",
+      "script": { "structured-dialogue": ["late_ok"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-study-sparks",
+          "conversation": "ss-conv-1",
+          "video": "vid-ss-001",
+          "brief": "brief-exam-sprint",
+          "key": "f0103-main-key"
+        },
+        { "op": "set_active", "conversation": "ss-conv-1" },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-study-sparks", "conversation": "ss-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "ss-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-04-timeout-before-acceptance",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Timeout where the provider never accepted; lookup proves non-acceptance, safe retry",
+      "script": { "structured-dialogue": ["timeout_before_acceptance"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0104-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-05-backup-unknown-acceptance",
+      "category": "F01",
+      "class": "unrecoverable",
+      "title": "Backup without idempotency/status times out after acceptance; user retries with a new key",
+      "script": {
+        "structured-dialogue": ["transport_error", "transport_error", "transport_error"],
+        "compatible-backup": ["timeout_after_acceptance"]
+      },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0105-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "resubmit_new_key", "job": "main", "key": "f0105-user-retry-key" },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "RECONCILIATION_REQUIRED" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F01-06-wrong-schema-then-repair",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Wrong-schema output must be rejected and repaired, not leniently accepted",
+      "script": { "structured-dialogue": ["wrong_schema"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0106-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 3,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-07-truncated-twice",
+      "category": "F01",
+      "class": "unrecoverable",
+      "title": "Truncated output and truncated repair: safe failure, no artifact",
+      "script": { "structured-dialogue": ["truncated", "truncated"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0107-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "CONTRACT_INVALID_AFTER_REPAIR" } },
+        "max_billable_ops": 3,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F01-08-budget-exhausted",
+      "category": "F01",
+      "class": "unrecoverable",
+      "title": "Every dialogue attempt fails before acceptance; the shared budget ends the job safely",
+      "script": {
+        "structured-dialogue": ["transport_error", "transport_error", "transport_error"],
+        "compatible-backup": ["transport_error", "transport_error", "transport_error", "transport_error"]
+      },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0108-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "BUDGET_EXHAUSTED" } },
+        "max_billable_ops": 1,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F01-09-stale-attempt-late-result",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Expired attempt delivers its provider result after another worker completed the job",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0109-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [
+            { "at": "after_provider_accept_before_receipt", "stage": "dialogue_draft", "kind": "suspend" }
+          ]
+        },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "resume", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F01-10-empty-then-repair",
+      "category": "F01",
+      "class": "recoverable",
+      "title": "Empty output is rejected and one repair produces a valid draft",
+      "script": { "structured-dialogue": ["empty"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0110-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 3,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+
+    {
+      "id": "F02-01-chat-switch-same-creator",
+      "category": "F02",
+      "class": "happy",
+      "title": "User switches to another chat while the job runs; result must stay in the original chat",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0201-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [
+            {
+              "at": "before_stage:dialogue_draft",
+              "kind": "event",
+              "event": "set_active",
+              "args": { "conversation": "dn-conv-2" }
+            }
+          ]
+        },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1, "dn-conv-2": 0 }
+      }
+    },
+    {
+      "id": "F02-02-switch-to-other-creator",
+      "category": "F02",
+      "class": "happy",
+      "title": "UI switches to the other creator's chat mid-job; result must not cross creators",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0202-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [
+            {
+              "at": "before_stage:dialogue_draft",
+              "kind": "event",
+              "event": "set_active",
+              "args": { "conversation": "ss-conv-1" }
+            }
+          ]
+        },
+        { "op": "reopen", "actor": "actor-study-sparks", "conversation": "ss-conv-1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1, "ss-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F02-03-warm-cache-other-creator",
+      "category": "F02",
+      "class": "happy",
+      "title": "Warm desk-notes context, then a study-sparks job: audience must be study-sparks",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "warm",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0203-warm-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "set_active", "conversation": "ss-conv-1" },
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-study-sparks",
+          "conversation": "ss-conv-1",
+          "video": "vid-ss-001",
+          "brief": "brief-exam-sprint",
+          "key": "f0203-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-study-sparks", "conversation": "ss-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "warm": { "state": "DRAFT_READY" }, "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 4,
+        "drafts": { "dn-conv-1": 1, "ss-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F02-04-revision-between-jobs",
+      "category": "F02",
+      "class": "happy",
+      "title": "tc-r2 corrects the battery fact between two jobs; the second must use tc-r2",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "warm",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-battery",
+          "key": "f0204-warm-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "publish_revision", "product": "tallycube", "revision": "tc-r2" },
+        { "op": "set_active", "conversation": "ss-conv-1" },
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-study-sparks",
+          "conversation": "ss-conv-1",
+          "video": "vid-ss-002",
+          "brief": "brief-exam-battery",
+          "key": "f0204-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-study-sparks", "conversation": "ss-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "warm": { "state": "DRAFT_READY" }, "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 4,
+        "drafts": { "dn-conv-1": 1, "ss-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F02-05-revision-mid-job",
+      "category": "F02",
+      "class": "unrecoverable",
+      "title": "Product revision published while the job runs: reject explicitly, never save a stale draft",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-battery",
+          "key": "f0205-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [
+            {
+              "at": "before_stage:dialogue_draft",
+              "kind": "event",
+              "event": "publish_revision",
+              "args": { "product": "tallycube", "revision": "tc-r2" }
+            }
+          ]
+        },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "STALE_REVISION" } },
+        "max_billable_ops": 1,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F02-06-evidence-missing",
+      "category": "F02",
+      "class": "unrecoverable",
+      "title": "Brief needs a fact that only exists as an unapproved marketing note",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-outcome",
+          "key": "f0206-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "EVIDENCE_MISSING" } },
+        "max_billable_ops": 1,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+
+    {
+      "id": "F03-01-close-poll-reopen",
+      "category": "F03",
+      "class": "happy",
+      "title": "Close the app mid-job, poll repeatedly, reopen twice: same saved result, no extra work",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0301-main-key"
+        },
+        { "op": "close_app" },
+        { "op": "poll", "job": "main", "times": 3 },
+        { "op": "work", "worker": "w1" },
+        { "op": "poll", "job": "main", "times": 3 },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" },
+        { "op": "close_app" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-02-repeated-submission-after-reconnect",
+      "category": "F03",
+      "class": "happy",
+      "title": "App reconnects and resubmits the same request with the same idempotency key",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0302-main-key"
+        },
+        { "op": "close_app" },
+        { "op": "resubmit", "job": "main" },
+        { "op": "work", "worker": "w1" },
+        { "op": "resubmit", "job": "main" },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-03-crash-between-result-and-save",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Worker dies during final persistence; restart and reopen must not regenerate",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0303-main-key"
+        },
+        { "op": "work", "worker": "w1", "faults": [{ "at": "inside_final_commit", "kind": "crash" }] },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-04-db-failure-during-save",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Database transaction failure during final persistence",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0304-main-key"
+        },
+        { "op": "work", "worker": "w1", "faults": [{ "at": "inside_final_commit", "kind": "db_fail" }] },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-05-crash-after-receipt",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Worker restart after the dialogue receipt committed",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0305-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [{ "at": "after_receipt", "stage": "dialogue_draft", "kind": "crash" }]
+        },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-06-wrong-cta-repair-replaces",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Wrong CTA: the repair must replace the candidate, not be appended to it",
+      "script": { "structured-dialogue": ["wrong_cta"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0306-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 3,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-07-failed-repair",
+      "category": "F03",
+      "class": "unrecoverable",
+      "title": "Wrong line count, then a repair with a wrong CTA: no artifact may masquerade as ready",
+      "script": { "structured-dialogue": ["wrong_line_count", "wrong_cta"] },
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0307-main-key"
+        },
+        { "op": "work", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "FAILED", "error_code": "CONTRACT_INVALID_AFTER_REPAIR" } },
+        "max_billable_ops": 3,
+        "drafts": { "dn-conv-1": 0 }
+      }
+    },
+    {
+      "id": "F03-08-stale-worker-terminal-overwrite",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "A paused worker resumes after another completed the job and tries to save again",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0308-main-key"
+        },
+        { "op": "work", "worker": "w1", "faults": [{ "at": "before_final_commit", "kind": "suspend" }] },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "resume", "worker": "w1" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-09-crash-after-acceptance-before-receipt",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Worker dies after the provider accepted but before the local receipt committed",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0309-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [
+            { "at": "after_provider_accept_before_receipt", "stage": "dialogue_draft", "kind": "crash" }
+          ]
+        },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    },
+    {
+      "id": "F03-10-crash-before-submission",
+      "category": "F03",
+      "class": "recoverable",
+      "title": "Worker dies after recording the call intent but before submitting it",
+      "script": {},
+      "steps": [
+        {
+          "op": "submit",
+          "job": "main",
+          "actor": "actor-desk-notes",
+          "conversation": "dn-conv-1",
+          "video": "vid-dn-001",
+          "brief": "brief-desk-reset",
+          "key": "f0310-main-key"
+        },
+        {
+          "op": "work",
+          "worker": "w1",
+          "faults": [{ "at": "after_intent_before_submit", "stage": "dialogue_draft", "kind": "crash" }]
+        },
+        { "op": "advance", "ms": 31000 },
+        { "op": "work", "worker": "w2" },
+        { "op": "reopen", "actor": "actor-desk-notes", "conversation": "dn-conv-1" }
+      ],
+      "expect": {
+        "jobs": { "main": { "state": "DRAFT_READY" } },
+        "max_billable_ops": 2,
+        "drafts": { "dn-conv-1": 1 }
+      }
+    }
+  ]
+}

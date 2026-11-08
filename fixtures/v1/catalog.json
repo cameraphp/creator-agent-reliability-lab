@@ -1,0 +1,270 @@
+{
+  "catalog_version": "v1",
+  "notice": "All records are ORIGINAL and SYNTHETIC. No real creators, accounts, videos, products or platforms. Video analysis values are precomputed fictional metadata; nothing is downloaded or transcribed.",
+  "policy_version": "policy-v1",
+  "actors": [
+    { "actor_id": "actor-desk-notes", "creator_id": "desk-notes" },
+    { "actor_id": "actor-study-sparks", "creator_id": "study-sparks" }
+  ],
+  "creators": [
+    {
+      "creator_id": "desk-notes",
+      "display_name": "Desk Notes",
+      "profile_revision": "dn-p1",
+      "audience": "remote workers resetting small home desks",
+      "tone": "calm",
+      "account": { "account_ref": "synthetic-acct-dn", "state": "CONNECTED" },
+      "conversations": ["dn-conv-1", "dn-conv-2"],
+      "videos": ["vid-dn-001", "vid-dn-002"]
+    },
+    {
+      "creator_id": "study-sparks",
+      "display_name": "Study Sparks",
+      "profile_revision": "ss-p1",
+      "audience": "university students planning exam weeks",
+      "tone": "upbeat",
+      "account": { "account_ref": "synthetic-acct-ss", "state": "CONNECTED" },
+      "conversations": ["ss-conv-1", "ss-conv-2"],
+      "videos": ["vid-ss-001", "vid-ss-002"]
+    }
+  ],
+  "videos": [
+    {
+      "video_id": "vid-dn-001",
+      "creator_id": "desk-notes",
+      "analysis": {
+        "duration_seconds": 42,
+        "topic": "five-minute desk reset",
+        "hook_moment_seconds": 3,
+        "on_screen_product": "TallyCube",
+        "pacing": "steady"
+      }
+    },
+    {
+      "video_id": "vid-dn-002",
+      "creator_id": "desk-notes",
+      "analysis": {
+        "duration_seconds": 31,
+        "topic": "cable tidy before a focus block",
+        "hook_moment_seconds": 2,
+        "on_screen_product": "TallyCube",
+        "pacing": "quick"
+      }
+    },
+    {
+      "video_id": "vid-ss-001",
+      "creator_id": "study-sparks",
+      "analysis": {
+        "duration_seconds": 38,
+        "topic": "exam-week study sprint",
+        "hook_moment_seconds": 1,
+        "on_screen_product": "TallyCube",
+        "pacing": "energetic"
+      }
+    },
+    {
+      "video_id": "vid-ss-002",
+      "creator_id": "study-sparks",
+      "analysis": {
+        "duration_seconds": 45,
+        "topic": "library break planning",
+        "hook_moment_seconds": 4,
+        "on_screen_product": "TallyCube",
+        "pacing": "steady"
+      }
+    }
+  ],
+  "products": [
+    {
+      "product_id": "tallycube",
+      "name": "TallyCube",
+      "description": "An invented palm-sized desk timer. Fictional.",
+      "initial_revision": "tc-r1",
+      "revisions": [
+        {
+          "revision": "tc-r1",
+          "facts": [
+            {
+              "fact_id": "tc-r1-flip",
+              "key": "flip-start",
+              "status": "approved",
+              "value": "flip it to start a 25-minute focus block",
+              "source_ref": "fixture://tallycube/tc-r1/spec#flip"
+            },
+            {
+              "fact_id": "tc-r1-range",
+              "key": "timer-range",
+              "status": "approved",
+              "value": "counts from 1 to 90 minutes",
+              "source_ref": "fixture://tallycube/tc-r1/spec#range"
+            },
+            {
+              "fact_id": "tc-r1-battery",
+              "key": "battery",
+              "status": "approved",
+              "value": "runs about 30 days per charge",
+              "source_ref": "fixture://tallycube/tc-r1/spec#battery"
+            },
+            {
+              "fact_id": "tc-note-productivity",
+              "key": "productivity-outcome",
+              "status": "unapproved",
+              "value": "guaranteed to double productivity",
+              "source_ref": "fixture://tallycube/marketing-notes#draft"
+            }
+          ]
+        },
+        {
+          "revision": "tc-r2",
+          "facts": [
+            {
+              "fact_id": "tc-r2-flip",
+              "key": "flip-start",
+              "status": "approved",
+              "value": "flip it to start a 25-minute focus block",
+              "source_ref": "fixture://tallycube/tc-r2/spec#flip"
+            },
+            {
+              "fact_id": "tc-r2-range",
+              "key": "timer-range",
+              "status": "approved",
+              "value": "counts from 1 to 90 minutes",
+              "source_ref": "fixture://tallycube/tc-r2/spec#range"
+            },
+            {
+              "fact_id": "tc-r2-battery",
+              "key": "battery",
+              "status": "approved",
+              "value": "runs about 21 days per charge",
+              "source_ref": "fixture://tallycube/tc-r2/spec#battery",
+              "supersedes": "tc-r1-battery"
+            },
+            {
+              "fact_id": "tc-note-productivity",
+              "key": "productivity-outcome",
+              "status": "unapproved",
+              "value": "guaranteed to double productivity",
+              "source_ref": "fixture://tallycube/marketing-notes#draft"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "briefs": [
+    {
+      "brief_id": "brief-desk-reset",
+      "brief_revision": "bdr-1",
+      "creator_id": "desk-notes",
+      "product_id": "tallycube",
+      "hook_angle": "A five-minute desk reset that actually sticks",
+      "line_count": 6,
+      "cta": "Follow for the full desk reset.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["flip-start", "timer-range"],
+      "turnaround": "standard"
+    },
+    {
+      "brief_id": "brief-desk-fast",
+      "brief_revision": "bdf-1",
+      "creator_id": "desk-notes",
+      "product_id": "tallycube",
+      "hook_angle": "Clear your desk before the next call",
+      "line_count": 6,
+      "cta": "Follow for the full desk reset.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["flip-start"],
+      "turnaround": "fast"
+    },
+    {
+      "brief_id": "brief-desk-battery",
+      "brief_revision": "bdb-1",
+      "creator_id": "desk-notes",
+      "product_id": "tallycube",
+      "hook_angle": "One less cable on the desk",
+      "line_count": 6,
+      "cta": "Follow for the full desk reset.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["battery", "flip-start"],
+      "turnaround": "standard"
+    },
+    {
+      "brief_id": "brief-desk-outcome",
+      "brief_revision": "bdo-1",
+      "creator_id": "desk-notes",
+      "product_id": "tallycube",
+      "hook_angle": "What a desk timer really changes",
+      "line_count": 6,
+      "cta": "Follow for the full desk reset.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["productivity-outcome"],
+      "turnaround": "standard"
+    },
+    {
+      "brief_id": "brief-exam-sprint",
+      "brief_revision": "bes-1",
+      "creator_id": "study-sparks",
+      "product_id": "tallycube",
+      "hook_angle": "The exam-week sprint that keeps you honest",
+      "line_count": 6,
+      "cta": "Save this for exam week.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["flip-start", "timer-range"],
+      "turnaround": "standard"
+    },
+    {
+      "brief_id": "brief-exam-battery",
+      "brief_revision": "beb-1",
+      "creator_id": "study-sparks",
+      "product_id": "tallycube",
+      "hook_angle": "A timer that survives the whole revision season",
+      "line_count": 6,
+      "cta": "Save this for exam week.",
+      "word_range": [45, 120],
+      "required_fact_keys": ["battery"],
+      "turnaround": "standard"
+    }
+  ],
+  "provider_profiles": [
+    {
+      "profile_id": "quick-classify",
+      "description": "Fictional cheap profile: short 2k context window; lists draft_dialogue but cannot fit its context requirement.",
+      "tasks": ["classify_video", "draft_dialogue"],
+      "output_modes": ["json_schema"],
+      "max_context_tokens": 2000,
+      "credits_per_1k_tokens": 1,
+      "supports_idempotency_key": true,
+      "supports_status_lookup": true
+    },
+    {
+      "profile_id": "deep-profile",
+      "description": "Fictional expensive profile for long creator-profile analysis.",
+      "tasks": ["analyze_profile", "classify_video"],
+      "output_modes": ["json_schema"],
+      "max_context_tokens": 32000,
+      "credits_per_1k_tokens": 12,
+      "supports_idempotency_key": true,
+      "supports_status_lookup": true
+    },
+    {
+      "profile_id": "structured-dialogue",
+      "description": "Fictional primary profile for schema-constrained dialogue drafts.",
+      "tasks": ["draft_dialogue"],
+      "output_modes": ["json_schema"],
+      "max_context_tokens": 8000,
+      "credits_per_1k_tokens": 4,
+      "supports_idempotency_key": true,
+      "supports_status_lookup": true
+    },
+    {
+      "profile_id": "compatible-backup",
+      "description": "Fictional backup with compatible output but NO idempotency key and NO status lookup.",
+      "tasks": ["draft_dialogue"],
+      "output_modes": ["json_schema"],
+      "max_context_tokens": 8000,
+      "credits_per_1k_tokens": 5,
+      "supports_idempotency_key": false,
+      "supports_status_lookup": false
+    }
+  ]
+}
