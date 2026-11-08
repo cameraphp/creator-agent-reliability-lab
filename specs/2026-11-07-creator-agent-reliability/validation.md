@@ -23,6 +23,12 @@
 | R19 | T-A1 (trace sanitized), T-P4                                                                    | pass                          |
 | R20 | `npm run evaluate:*` over 32 scenarios (6 controls, F01 10, F02 6, F03 10)                      | pass                          |
 | R21 | baseline exit 3; hardened exit 0; T-S sentinels F01/F02/F03                                     | pass                          |
-| R22 | `.github/workflows/ci.yml` (**configured, not verified hosted**); `npm run smoke` 13/13         | partial: hosted CI unverified |
+| R22 | `ci.yml`; hosted run #1 succeeded on `55aae03` (step conclusions only); smoke 13/13 locally     | pass (hosted: initial commit) |
 
-Totals: `npm test` 8 files, 55 tests passed. Exit codes and timings: see `BUILD_REPORT.md`.
+Totals: `npm test` 8 files, 55 tests passed (local build; 58 after the demo-label regressions T-D1..T-D3).
+Exit codes and timings: see `BUILD_REPORT.md`.
+
+R22 hosted evidence (publication note, 2026-11-07): run
+[#1](https://github.com/cameraphp/creator-agent-reliability-lab/actions/runs/42429152724) on commit
+[`55aae03`](https://github.com/cameraphp/creator-agent-reliability-lab/commit/55aae0308b5fe15d2a32fff39f8c919c00a84d10);
+hosted job logs were not read, so hosted counts are not independently confirmed.

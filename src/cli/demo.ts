@@ -8,6 +8,7 @@ import { loadDataset, runScenario } from "../eval/runner.js";
 import { CatalogState } from "../fixtures.js";
 import { SimulatedProvider } from "../providers/simulated.js";
 import { Worker } from "../worker/worker.js";
+import { describeSubmission } from "./demo-format.js";
 
 /** Five-minute narrated demo. Synthetic data only; nothing leaves 127.0.0.1. */
 const say = (s = "") => console.log(s);
@@ -45,10 +46,10 @@ async function main(): Promise<number> {
       brief_id: "brief-desk-reset",
       idempotency_key: key,
     });
+    const submitted = describeSubmission(sub.status, sub.json);
+    say(submitted.line);
+    if (!submitted.ok) return 1;
     const jobId = sub.json.job.job_id as string;
-    say(
-      `POST /v1/analysis-jobs -> ${sub.status} job ${jobId} state ${sub.json.job.state} (committed before 202)`,
-    );
     say(`client: "${sub.json.job.client_guidance.message}"  -> closing the app now`);
     const worker = new Worker("demo-worker", {
       pool: workerPool,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lenientParse } from "../src/baseline/naive.js";
+import { describeSubmission } from "../src/cli/demo-format.js";
 import { SubmitRequestSchema } from "../src/contracts.js";
 import { assembleContext, type AssembledContext, ScopedContextCache } from "../src/core/context.js";
 import { backoffMs, defaultPolicy } from "../src/core/policy.js";
@@ -204,5 +205,30 @@ describe("T-P routing, policy, trace sanitization (R15, R16, R19)", () => {
       }).success,
     ).toBe(false);
     expect(lenientParse("")).toBeNull();
+  });
+});
+
+describe("T-D demo submission label (presentation only)", () => {
+  const job = { job_id: "job-1", state: "READY" };
+  it("T-D1 202 is described as a new job acknowledged after durable commit", () => {
+    const r = describeSubmission(202, { job, deduplicated_by: null });
+    expect(r.ok).toBe(true);
+    expect(r.line).toBe(
+      "POST /v1/analysis-jobs -> 202 job job-1 state READY (new job; acknowledged after durable commit)",
+    );
+  });
+  it("T-D2 200 is described as the existing job, with the reason only when present", () => {
+    const withReason = describeSubmission(200, { job, deduplicated_by: "semantic_operation" });
+    expect(withReason.ok).toBe(true);
+    expect(withReason.line).toContain(
+      "existing job returned, no new job created; deduplicated_by semantic_operation",
+    );
+    expect(withReason.line).not.toMatch(/202|durable commit/);
+    expect(describeSubmission(200, { job, deduplicated_by: null }).line).not.toContain("deduplicated_by");
+  });
+  it("T-D3 any other status is not labelled a success", () => {
+    const r = describeSubmission(409, { error: { code: "IDEMPOTENCY_KEY_REUSED" } });
+    expect(r.ok).toBe(false);
+    expect(r.line).toBe("POST /v1/analysis-jobs -> 409 (not accepted: IDEMPOTENCY_KEY_REUSED)");
   });
 });

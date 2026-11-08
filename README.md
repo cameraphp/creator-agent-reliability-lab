@@ -31,7 +31,7 @@ Requires Node 22.12+/24 and a running Docker Desktop. Everything installs projec
 npm ci
 npm run db:up        # project-scoped container on 127.0.0.1:55439, named lab volume
 npm run db:migrate   # creates creator_lab, creator_lab_test, creator_lab_eval; roles; RLS
-npm test             # 55 tests on real Postgres (RLS, claims, crash recovery, sentinels)
+npm test             # 58 tests on real Postgres (RLS, claims, crash recovery, sentinels)
 npm run evaluate:hardened          # exit 0 = every gate passed
 npm run evaluate:baseline          # EXPECTED BASELINE FAILURE: exit 3
 if ($LASTEXITCODE -ne 3) { throw "baseline did not reproduce its defects (exit $LASTEXITCODE)" }
@@ -89,6 +89,8 @@ Clients cannot set provider, faults, retry policy, URLs, ownership or state.
 - Audit findings: `docs/audit-report.md`. Runbook: `docs/runbook.md`. Demo script: `docs/demo-script.md`.
 - Specs: `specs/2026-11-07-creator-agent-reliability/`. Progress and exact results: `BUILD_REPORT.md`.
 - Method: `AUDIT_METHODOLOGY.md`, `REMEDIATION_PLAN.md`. Dependency licenses: `docs/THIRD_PARTY_LICENSES.md`.
-- CI: `.github/workflows/ci.yml` is **configured, not verified** on hosted GitHub Actions (no remote yet).
+- CI: `.github/workflows/ci.yml` runs on GitHub Actions. Publication note (2026-11-07): the initial commit
+  [`55aae03`](https://github.com/cameraphp/creator-agent-reliability-lab/commit/55aae0308b5fe15d2a32fff39f8c919c00a84d10) was pushed to `main` and the first hosted run [#1](https://github.com/cameraphp/creator-agent-reliability-lab/actions/runs/42429152724) succeeded. Only its step
+  conclusions were checked; the test, scenario and smoke counts quoted in this README come from local runs.
 
 Project license: not yet chosen (owner decision).

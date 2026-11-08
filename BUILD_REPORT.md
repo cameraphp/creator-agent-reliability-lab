@@ -1,9 +1,19 @@
 # BUILD_REPORT — Creator Agent Reliability Lab
 
 Status: **all four checkpoints complete locally (2026-11-07).** Every declared local gate passed in the
-final run below. Hosted CI is **configured but not verified** (no remote). Owner review, publication,
-video recording and real-provider validation are later human steps. Nothing was initialized in Git,
-committed, pushed, published or deployed.
+final run below. _Historical (local build phase):_ at build time hosted CI was configured but not verified
+(no remote existed), and nothing was initialized in Git, committed, pushed, published or deployed.
+
+## Publication note (2026-11-07, after the local build)
+
+- At the owner's request the lab was initialized in Git and the initial commit
+  [`55aae03`](https://github.com/cameraphp/creator-agent-reliability-lab/commit/55aae0308b5fe15d2a32fff39f8c919c00a84d10) was pushed to `main` of `cameraphp/creator-agent-reliability-lab`.
+- The first hosted GitHub Actions run, [#1](https://github.com/cameraphp/creator-agent-reliability-lab/actions/runs/42429152724), succeeded on that commit. Only its step conclusions were
+  checked; hosted job logs were not read, so hosted test/scenario counts are not independently confirmed.
+- Local evidence (this report) and hosted evidence (step conclusions of run #1) are separate. Later commits
+  need their own hosted runs.
+- Still open: owner review, video recording, real-provider validation and a project-license decision. Nothing
+  was released, tagged or deployed.
 
 ## Resume instructions
 
@@ -128,5 +138,5 @@ same product-only cache that causes F02 (provenance from a previous job); it is 
 ## Next steps
 
 1. Owner review of code, docs and claims; record the demo (`docs/demo-script.md`).
-2. Decide on Git init/publication and a project license; then verify CI on a hosted run.
+2. Decide on a project license (Git publication and a first hosted CI run are done; see the publication note).
 3. Validate one real provider's idempotency/status/billing semantics in a sandbox before trusting reconciliation.

@@ -1,4 +1,4 @@
-# CONFIGURED, NOT YET VERIFIED on hosted GitHub Actions (no remote exists in this phase).
+# Hosted GitHub Actions. First hosted run succeeded on the initial commit 55aae03 (2026-11-07); each commit needs its own run.
 # Disposable Postgres service, secret-free synthetic fixtures, throwaway credentials.
 name: ci
 
